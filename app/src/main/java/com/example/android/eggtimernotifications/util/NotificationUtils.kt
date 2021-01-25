@@ -24,6 +24,7 @@ import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import com.example.android.eggtimernotifications.MainActivity
 import com.example.android.eggtimernotifications.R
+import com.example.android.eggtimernotifications.receiver.SnoozeReceiver
 
 // Notification ID.
 private const val NOTIFICATION_ID = 0
@@ -40,8 +41,10 @@ private const val FLAGS = 0
 fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context) {
     // Create the content intent for the notification, which launches
     // this activity
+
     // TODO: Step 1.11 create intent
     val contentIntent = Intent(applicationContext, MainActivity::class.java)
+
     // TODO: Step 1.12 create PendingIntent
     val contentPendingIntent = PendingIntent.getActivity(
         applicationContext,
@@ -49,6 +52,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         contentIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
+
     // TODO: Step 2.0 add style
     val eggImage = BitmapFactory.decodeResource(
         applicationContext.resources,
@@ -57,7 +61,15 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
     val bigPictureStyle = NotificationCompat.BigPictureStyle()
         .bigPicture(eggImage)
         .bigLargeIcon(null)
+
     // TODO: Step 2.2 add snooze action
+    val snoozeIntent = Intent(applicationContext, SnoozeReceiver::class.java)
+    val snoozePendingIntent = PendingIntent.getBroadcast(
+        applicationContext,
+        REQUEST_CODE,
+        snoozeIntent,
+        FLAGS // Is the same as PendingIntent.FLAG_ONE_SHOT
+    )
 
     // TODO: Step 1.2 get an instance of NotificationCompat.Builder
     //  Build the notification
@@ -72,13 +84,21 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
     builder.setSmallIcon(R.drawable.cooked_egg)
         .setContentTitle(applicationContext.getString(R.string.notification_title))
         .setContentText(messageBody)
+
     // TODO: Step 1.13 set content intent
     builder.setContentIntent(contentPendingIntent)
         .setAutoCancel(true)
+
     // TODO: Step 2.1 add style to builder
     builder.setStyle(bigPictureStyle)
         .setLargeIcon(eggImage)
+
     // TODO: Step 2.3 add snooze action
+    builder.addAction(
+        R.drawable.egg_icon,
+        applicationContext.getString(R.string.snooze),
+        snoozePendingIntent
+    )
 
     // TODO: Step 2.5 set priority
 
